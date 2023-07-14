@@ -1,39 +1,70 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# owl.dart
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+An opinionated widgets & utilities library for flutter.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+#### Logger
 
-## Getting started
+#### Preferences
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+### Animations
 
-## Usage
+#### AnimatedNumber
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Implicitly animations a change to `number`
+
+The `number` is formatted using the `numberFormat`. An animation only
+displays when the formatted number changes.
 
 ```dart
-const like = 'sample';
+AnimatedNumber(
+  number: 420
+);
 ```
 
-## Additional information
+### Async
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+#### AsyncValueBuilder
+
+Useful for rendering a Widget that depends on an `AsyncValue<T>`.
+Handles default Error and Loading states with a `loadingBuilder` for custom loading widgets.
+
+```dart
+final asyncValue = ref.watch(someFutureOrStreamProvider);
+return AsyncValueBuilder<T>(
+  value: scheduleNotifier,
+  builder: (T data) {
+    return Widget();
+  },
+);
+```
+
+#### ItemListBuilder
+
+Useful for rendering a `ListView.builder()` that depends on an `AsyncValue<List<T>>`.
+Handles default Error and Loading states with a `loadingBuilder` for custom loading widgets.
+
+```dart
+final asyncValue = ref.watch(someFutureOrStreamProvider);
+return ItemListBuilder<T>(
+  data: asyncValue,
+  itemBuilder: (BuildContext context, T item, int index) {
+    return ListItem();
+  },
+);
+```
+
+### Responsive
+
+#### ResponsiveCenter
+
+#### ResponsiveTwoColumnLayout
+
+### General
+
+#### Clickable
+
+#### Unfocus
+
+#### ConditionalParentWidget
