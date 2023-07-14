@@ -7,11 +7,13 @@ environment:
   flutter: ">=1.17.0"
 
 dependencies:
+  encrypt: ^5.0.1
   flutter:
     sdk: flutter
   hooks_riverpod: ^2.3.6
   intl: ^0.18.1
   logging: ^1.2.0
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_lints: ^2.0.0
