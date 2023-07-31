@@ -2,6 +2,13 @@
 
 An opinionated widgets & utilities library for flutter.
 
+## Getting Started
+
+```
+owl:
+  git: https://github.com/innovative-owl/owl.dart.git
+```
+
 ## Features
 
 #### Logger
