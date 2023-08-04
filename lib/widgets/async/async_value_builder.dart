@@ -7,11 +7,13 @@ class AsyncValueBuilder<T> extends ConsumerWidget {
     required this.value,
     required this.builder,
     this.loadingBuilder,
+    this.errorBuilder,
   }) : super(key: key);
 
   final AsyncValue<T> value;
   final Widget Function(T) builder;
   final WidgetBuilder? loadingBuilder;
+  final WidgetBuilder? errorBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,6 +23,7 @@ class AsyncValueBuilder<T> extends ConsumerWidget {
         return _ErrorBuilder(
           error: error,
           stackTrace: stackTrace,
+          builder: errorBuilder,
         );
       },
       loading: () {
@@ -57,7 +60,9 @@ class AsyncValueBuilderWithCrossfade<T> extends ConsumerWidget {
       transitionBuilder: (child, animation) {
         return FadeTransition(opacity: animation, child: child);
       },
-      child: value.isLoading ? _LoadingBuilder(builder: loadingBuilder) : data(value.requireValue),
+      child: value.isLoading
+          ? _LoadingBuilder(builder: loadingBuilder)
+          : data(value.requireValue),
     );
   }
 }
@@ -85,18 +90,23 @@ class _ErrorBuilder extends StatelessWidget {
   const _ErrorBuilder({
     required this.error,
     required this.stackTrace,
+    this.builder,
   });
 
   final Object error;
   final StackTrace stackTrace;
+  final WidgetBuilder? builder;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        error.toString(),
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-    );
+    if (builder == null) {
+      return Center(
+        child: Text(
+          error.toString(),
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      );
+    }
+    return builder!(context);
   }
 }
