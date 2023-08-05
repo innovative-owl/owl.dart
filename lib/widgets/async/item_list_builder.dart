@@ -15,6 +15,7 @@ class ItemListBuilder<T> extends StatelessWidget {
     this.loadingBuilder,
     this.physics,
     this.shrinkWrap = true,
+    this.grid = false,
   });
 
   final AsyncValue<List<T>> data;
@@ -22,12 +23,30 @@ class ItemListBuilder<T> extends StatelessWidget {
   final WidgetBuilder? loadingBuilder;
 
   final ScrollPhysics? physics;
+
   final bool shrinkWrap;
+  final bool grid;
 
   @override
   Widget build(BuildContext context) {
     return data.when(
       data: (value) {
+        if (grid) {
+          return GridView.builder(
+            shrinkWrap: shrinkWrap,
+            physics: physics,
+            itemCount: value.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              childAspectRatio: 0.8,
+            ),
+            itemBuilder: (context, index) {
+              final item = value[index];
+              return itemBuilder(context, item, index);
+            },
+          );
+        }
+
         return ListView.builder(
           physics: physics,
           shrinkWrap: shrinkWrap,
