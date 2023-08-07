@@ -15,19 +15,45 @@ class ItemListBuilder<T> extends StatelessWidget {
     this.loadingBuilder,
     this.physics,
     this.shrinkWrap = true,
+    this.gridDelegate,
   });
 
+  /// The data that this builder is currently representing.
   final AsyncValue<List<T>> data;
+
+  /// The builder that will be called for every item in [data].
   final ItemWidgetBuilder<T> itemBuilder;
+
+  /// The builder that will be called when [data] is loading.
   final WidgetBuilder? loadingBuilder;
 
+  /// The physics of the scrollable widget.
   final ScrollPhysics? physics;
+
+  /// Whether the scrollable widget should shrink-wrap its contents.
   final bool shrinkWrap;
+
+  /// The grid delegate to use for grid views.
+  /// If null, a list view will be used instead.
+  final SliverGridDelegate? gridDelegate;
 
   @override
   Widget build(BuildContext context) {
     return data.when(
       data: (value) {
+        if (gridDelegate != null) {
+          return GridView.builder(
+            shrinkWrap: shrinkWrap,
+            physics: physics,
+            itemCount: value.length,
+            gridDelegate: gridDelegate!,
+            itemBuilder: (context, index) {
+              final item = value[index];
+              return itemBuilder(context, item, index);
+            },
+          );
+        }
+
         return ListView.builder(
           physics: physics,
           shrinkWrap: shrinkWrap,
