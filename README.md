@@ -107,7 +107,7 @@ Used for cross-platfom clickables
 Implements the 'unfocus on background tap' behavior for its child.
 This example uses `MaterialApp.builder` to implement the 'unfocus onbackground tap' behavior app-wide.
 
-````dart
+```dart
 MaterialApp(
   home: Container(),
   builder: (_, child) => Unfocus(child: child),
