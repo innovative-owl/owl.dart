@@ -34,15 +34,12 @@ class ItemListBuilder<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return data.when(
       data: (value) {
-        if (grid) {
+        if (gridDelegate != null) {
           return GridView.builder(
             shrinkWrap: shrinkWrap,
             physics: physics,
             itemCount: value.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              childAspectRatio: 0.8,
-            ),
+            gridDelegate: gridDelegate,
             itemBuilder: (context, index) {
               final item = value[index];
               return itemBuilder(context, item, index);
