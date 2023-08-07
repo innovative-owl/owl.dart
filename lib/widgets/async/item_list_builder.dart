@@ -15,7 +15,10 @@ class ItemListBuilder<T> extends StatelessWidget {
     this.loadingBuilder,
     this.physics,
     this.shrinkWrap = true,
-    this.grid = false,
+  ///
+  /// Defaults to null, if set to a grid delegate - the item builder turns into a grid.
+  ///
+    this.gridDelegate,
   });
 
   final AsyncValue<List<T>> data;
