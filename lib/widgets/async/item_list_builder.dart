@@ -28,7 +28,7 @@ class ItemListBuilder<T> extends StatelessWidget {
   final ScrollPhysics? physics;
 
   final bool shrinkWrap;
-  final bool grid;
+  final SliverGridDelegate? gridDelegate;
 
   @override
   Widget build(BuildContext context) {
