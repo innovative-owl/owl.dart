@@ -112,6 +112,7 @@ MaterialApp(
   home: Container(),
   builder: (_, child) => Unfocus(child: child),
 );
+```
 
 #### ConditionalParentWidget
 
