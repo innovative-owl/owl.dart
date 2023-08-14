@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:owl/misc/logger/logger.dart';
 
 class AsyncValueBuilder<T> extends ConsumerWidget {
   const AsyncValueBuilder({
@@ -87,7 +86,7 @@ class _LoadingBuilder extends StatelessWidget {
   }
 }
 
-class _ErrorBuilder extends StatelessWidget with LoggerMixin {
+class _ErrorBuilder extends StatelessWidget {
   const _ErrorBuilder({
     required this.error,
     required this.stackTrace,
@@ -101,11 +100,10 @@ class _ErrorBuilder extends StatelessWidget with LoggerMixin {
   @override
   Widget build(BuildContext context) {
     if (builder == null) {
-      log.fine(error.toString());
       return Center(
-        child: Text(
+        child: SelectableText(
           error.toString(),
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       );
     }
