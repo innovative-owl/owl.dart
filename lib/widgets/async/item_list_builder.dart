@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:owl/misc/logger/logger.dart';
 
 typedef ItemWidgetBuilder<T> = Widget Function(
   BuildContext context,
@@ -13,6 +14,7 @@ class ItemListBuilder<T> extends StatelessWidget {
     required this.data,
     required this.itemBuilder,
     this.loadingBuilder,
+    this.errorBuilder,
     this.physics,
     this.shrinkWrap = true,
     this.gridDelegate,
@@ -26,6 +28,9 @@ class ItemListBuilder<T> extends StatelessWidget {
 
   /// The builder that will be called when [data] is loading.
   final WidgetBuilder? loadingBuilder;
+
+  /// The builder that will be called when [data] has an error.
+  final WidgetBuilder? errorBuilder;
 
   /// The physics of the scrollable widget.
   final ScrollPhysics? physics;
@@ -64,10 +69,10 @@ class ItemListBuilder<T> extends StatelessWidget {
         );
       },
       error: (e, st) {
-        // log.e(st);
         return _ErrorBuilder(
           error: e,
           stackTrace: st,
+          builder: errorBuilder,
         );
       },
       loading: () {
@@ -101,22 +106,28 @@ class _LoadingBuilder extends StatelessWidget {
   }
 }
 
-class _ErrorBuilder extends StatelessWidget {
+class _ErrorBuilder extends StatelessWidget with LoggerMixin {
   const _ErrorBuilder({
     required this.error,
     required this.stackTrace,
+    this.builder,
   });
 
   final Object error;
   final StackTrace stackTrace;
+  final WidgetBuilder? builder;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        error.toString(),
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-    );
+    if (builder == null) {
+      log.fine(error.toString());
+      return Center(
+        child: Text(
+          error.toString(),
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      );
+    }
+    return builder!(context);
   }
 }
