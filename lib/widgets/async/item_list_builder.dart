@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:owl/widgets/async/typedefs.dart';
 
 typedef ItemWidgetBuilder<T> = Widget Function(
   BuildContext context,
@@ -13,6 +14,7 @@ class ItemListBuilder<T> extends StatelessWidget {
     required this.data,
     required this.itemBuilder,
     this.loadingBuilder,
+    this.errorBuilder,
     this.physics,
     this.shrinkWrap = true,
     this.gridDelegate,
@@ -25,7 +27,10 @@ class ItemListBuilder<T> extends StatelessWidget {
   final ItemWidgetBuilder<T> itemBuilder;
 
   /// The builder that will be called when [data] is loading.
-  final WidgetBuilder? loadingBuilder;
+  final OwlLoadingBuilder? loadingBuilder;
+
+  /// The builder that will be called when [data] has an error.
+  final OwlErrorBuilder? errorBuilder;
 
   /// The physics of the scrollable widget.
   final ScrollPhysics? physics;
@@ -64,10 +69,10 @@ class ItemListBuilder<T> extends StatelessWidget {
         );
       },
       error: (e, st) {
-        // log.e(st);
         return _ErrorBuilder(
           error: e,
           stackTrace: st,
+          builder: errorBuilder,
         );
       },
       loading: () {
@@ -79,15 +84,12 @@ class ItemListBuilder<T> extends StatelessWidget {
   }
 }
 
-/// These are copied from AsyncValueBuilder, but they might change in the future
-/// to use shimmer or something else.
-
 class _LoadingBuilder extends StatelessWidget {
   const _LoadingBuilder({
     this.builder,
   });
 
-  final WidgetBuilder? builder;
+  final OwlLoadingBuilder? builder;
 
   @override
   Widget build(BuildContext context) {
@@ -105,18 +107,23 @@ class _ErrorBuilder extends StatelessWidget {
   const _ErrorBuilder({
     required this.error,
     required this.stackTrace,
+    required this.builder,
   });
 
   final Object error;
   final StackTrace stackTrace;
+  final OwlErrorBuilder? builder;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        error.toString(),
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-    );
+    if (builder == null) {
+      return Center(
+        child: SelectableText(
+          error.toString(),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      );
+    }
+    return builder!(context, error, stackTrace);
   }
 }

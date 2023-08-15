@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:owl/widgets/async/typedefs.dart';
 
 class AsyncValueBuilder<T> extends ConsumerWidget {
   const AsyncValueBuilder({
@@ -12,8 +13,8 @@ class AsyncValueBuilder<T> extends ConsumerWidget {
 
   final AsyncValue<T> value;
   final Widget Function(T) builder;
-  final WidgetBuilder? loadingBuilder;
-  final WidgetBuilder? errorBuilder;
+  final OwlLoadingBuilder? loadingBuilder;
+  final OwlErrorBuilder? errorBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -42,17 +43,23 @@ class AsyncValueBuilderWithCrossfade<T> extends ConsumerWidget {
     required this.data,
     this.duration = const Duration(milliseconds: 200),
     this.loadingBuilder,
+    this.errorBuilder,
   }) : super(key: key);
 
   final AsyncValue<T> value;
   final Widget Function(T) data;
   final Duration duration;
-  final WidgetBuilder? loadingBuilder;
+  final OwlLoadingBuilder? loadingBuilder;
+  final OwlErrorBuilder? errorBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (value.hasError) {
-      return const SizedBox.shrink();
+      return _ErrorBuilder(
+        error: value.error!,
+        stackTrace: value.stackTrace!,
+        builder: errorBuilder,
+      );
     }
 
     return AnimatedSwitcher(
@@ -61,7 +68,9 @@ class AsyncValueBuilderWithCrossfade<T> extends ConsumerWidget {
         return FadeTransition(opacity: animation, child: child);
       },
       child: value.isLoading
-          ? _LoadingBuilder(builder: loadingBuilder)
+          ? _LoadingBuilder(
+              builder: loadingBuilder,
+            )
           : data(value.requireValue),
     );
   }
@@ -72,7 +81,7 @@ class _LoadingBuilder extends StatelessWidget {
     this.builder,
   });
 
-  final WidgetBuilder? builder;
+  final OwlLoadingBuilder? builder;
 
   @override
   Widget build(BuildContext context) {
@@ -90,23 +99,23 @@ class _ErrorBuilder extends StatelessWidget {
   const _ErrorBuilder({
     required this.error,
     required this.stackTrace,
-    this.builder,
+    required this.builder,
   });
 
   final Object error;
   final StackTrace stackTrace;
-  final WidgetBuilder? builder;
+  final OwlErrorBuilder? builder;
 
   @override
   Widget build(BuildContext context) {
     if (builder == null) {
       return Center(
-        child: Text(
+        child: SelectableText(
           error.toString(),
-          style: Theme.of(context).textTheme.headlineMedium,
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       );
     }
-    return builder!(context);
+    return builder!(context, error, stackTrace);
   }
 }
