@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:owl/widgets/async/typedefs.dart';
 
 class AsyncValueBuilder<T> extends ConsumerWidget {
   const AsyncValueBuilder({
@@ -12,24 +13,31 @@ class AsyncValueBuilder<T> extends ConsumerWidget {
 
   final AsyncValue<T> value;
   final Widget Function(T) builder;
-  final WidgetBuilder? loadingBuilder;
-  final WidgetBuilder? errorBuilder;
+  final OwlLoadingBuilder? loadingBuilder;
+  final OwlErrorBuilder? errorBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return value.when(
       data: (data) => builder(data),
-      error: (error, stackTrace) {
-        return _ErrorBuilder(
-          error: error,
-          stackTrace: stackTrace,
-          builder: errorBuilder,
+      error: (e, st) {
+        if (errorBuilder != null) {
+          return errorBuilder!(
+            context,
+            e,
+            st,
+          );
+        }
+        return Center(
+          child: SelectableText(
+            e.toString(),
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
         );
       },
       loading: () {
-        return _LoadingBuilder(
-          builder: loadingBuilder,
-        );
+        return loadingBuilder?.call(context) ??
+            const Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -42,16 +50,25 @@ class AsyncValueBuilderWithCrossfade<T> extends ConsumerWidget {
     required this.data,
     this.duration = const Duration(milliseconds: 200),
     this.loadingBuilder,
+    this.errorBuilder,
   }) : super(key: key);
 
   final AsyncValue<T> value;
   final Widget Function(T) data;
   final Duration duration;
-  final WidgetBuilder? loadingBuilder;
+  final OwlLoadingBuilder? loadingBuilder;
+  final OwlErrorBuilder? errorBuilder;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (value.hasError) {
+      if (errorBuilder != null) {
+        return errorBuilder!(
+          context,
+          value.error!,
+          value.stackTrace!,
+        );
+      }
       return const SizedBox.shrink();
     }
 
@@ -61,52 +78,9 @@ class AsyncValueBuilderWithCrossfade<T> extends ConsumerWidget {
         return FadeTransition(opacity: animation, child: child);
       },
       child: value.isLoading
-          ? _LoadingBuilder(builder: loadingBuilder)
+          ? loadingBuilder?.call(context) ??
+              const Center(child: CircularProgressIndicator())
           : data(value.requireValue),
     );
-  }
-}
-
-class _LoadingBuilder extends StatelessWidget {
-  const _LoadingBuilder({
-    this.builder,
-  });
-
-  final WidgetBuilder? builder;
-
-  @override
-  Widget build(BuildContext context) {
-    if (builder == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    return builder!(context);
-  }
-}
-
-class _ErrorBuilder extends StatelessWidget {
-  const _ErrorBuilder({
-    required this.error,
-    required this.stackTrace,
-    this.builder,
-  });
-
-  final Object error;
-  final StackTrace stackTrace;
-  final WidgetBuilder? builder;
-
-  @override
-  Widget build(BuildContext context) {
-    if (builder == null) {
-      return Center(
-        child: SelectableText(
-          error.toString(),
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      );
-    }
-    return builder!(context);
   }
 }
