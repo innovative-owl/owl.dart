@@ -69,24 +69,61 @@ class ItemListBuilder<T> extends StatelessWidget {
         );
       },
       error: (e, st) {
-        if (errorBuilder != null) {
-          return errorBuilder!(
-            context,
-            e,
-            st,
-          );
-        }
-        return Center(
-          child: SelectableText(
-            e.toString(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+        return _ErrorBuilder(
+          error: e,
+          stackTrace: st,
+          builder: errorBuilder,
         );
       },
       loading: () {
-        return loadingBuilder?.call(context) ??
-            const Center(child: CircularProgressIndicator());
+        return _LoadingBuilder(
+          builder: loadingBuilder,
+        );
       },
     );
+  }
+}
+
+class _LoadingBuilder extends StatelessWidget {
+  const _LoadingBuilder({
+    this.builder,
+  });
+
+  final OwlLoadingBuilder? builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (builder == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return builder!(context);
+  }
+}
+
+class _ErrorBuilder extends StatelessWidget {
+  const _ErrorBuilder({
+    required this.error,
+    required this.stackTrace,
+    required this.builder,
+  });
+
+  final Object error;
+  final StackTrace stackTrace;
+  final OwlErrorBuilder? builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (builder == null) {
+      return Center(
+        child: SelectableText(
+          error.toString(),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      );
+    }
+    return builder!(context, error, stackTrace);
   }
 }

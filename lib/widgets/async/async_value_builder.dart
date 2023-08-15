@@ -20,24 +20,17 @@ class AsyncValueBuilder<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return value.when(
       data: (data) => builder(data),
-      error: (e, st) {
-        if (errorBuilder != null) {
-          return errorBuilder!(
-            context,
-            e,
-            st,
-          );
-        }
-        return Center(
-          child: SelectableText(
-            e.toString(),
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+      error: (error, stackTrace) {
+        return _ErrorBuilder(
+          error: error,
+          stackTrace: stackTrace,
+          builder: errorBuilder,
         );
       },
       loading: () {
-        return loadingBuilder?.call(context) ??
-            const Center(child: CircularProgressIndicator());
+        return _LoadingBuilder(
+          builder: loadingBuilder,
+        );
       },
     );
   }
@@ -62,14 +55,11 @@ class AsyncValueBuilderWithCrossfade<T> extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (value.hasError) {
-      if (errorBuilder != null) {
-        return errorBuilder!(
-          context,
-          value.error!,
-          value.stackTrace!,
-        );
-      }
-      return const SizedBox.shrink();
+      return _ErrorBuilder(
+        error: value.error!,
+        stackTrace: value.stackTrace!,
+        builder: errorBuilder,
+      );
     }
 
     return AnimatedSwitcher(
@@ -78,9 +68,54 @@ class AsyncValueBuilderWithCrossfade<T> extends ConsumerWidget {
         return FadeTransition(opacity: animation, child: child);
       },
       child: value.isLoading
-          ? loadingBuilder?.call(context) ??
-              const Center(child: CircularProgressIndicator())
+          ? _LoadingBuilder(
+              builder: loadingBuilder,
+            )
           : data(value.requireValue),
     );
+  }
+}
+
+class _LoadingBuilder extends StatelessWidget {
+  const _LoadingBuilder({
+    this.builder,
+  });
+
+  final OwlLoadingBuilder? builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (builder == null) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return builder!(context);
+  }
+}
+
+class _ErrorBuilder extends StatelessWidget {
+  const _ErrorBuilder({
+    required this.error,
+    required this.stackTrace,
+    required this.builder,
+  });
+
+  final Object error;
+  final StackTrace stackTrace;
+  final OwlErrorBuilder? builder;
+
+  @override
+  Widget build(BuildContext context) {
+    if (builder == null) {
+      return Center(
+        child: SelectableText(
+          error.toString(),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      );
+    }
+    return builder!(context, error, stackTrace);
   }
 }
