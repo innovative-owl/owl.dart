@@ -11,13 +11,13 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_hooks: ^0.20.0
-  hooks_riverpod: ^2.3.6
+  hooks_riverpod: ^2.3.8
   intl: ^0.18.1
   logging: ^1.2.0
   shared_preferences: ^2.2.0
 
 dev_dependencies:
-  flutter_lints: ^2.0.0
+  flutter_lints: ^2.0.2
   flutter_test:
     sdk: flutter
 
