@@ -132,4 +132,16 @@ return ConditionalParentWidget(
   ),
   conditionalBuilder: (Widget child) => SomeParentWidget(child: child),
 );
-````
+```
+
+#### SimpleAutoSaveTextField
+
+A debounced textfield that auto-saves a specified `duration` after the controller text changes
+
+```dart
+SimpleAutoSaveTextField(
+  controller: useTextEditingControlle(),
+  duration: Duration(seconds: 5), // defaults to 1 second
+  onSave: (String value) => save(value),
+);
+```
