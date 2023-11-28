@@ -12,4 +12,5 @@ export 'widgets/clickable.dart';
 export 'widgets/conditional_parent_widget.dart';
 export 'widgets/responsive/responsive_center.dart';
 export 'widgets/responsive/responsive_two_column_layout.dart';
+export 'widgets/simple_auto_save_text_field.dart';
 export 'widgets/unfocus.dart';
